@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>A voltar ao Clips…</title>
+<style>body{font:16px system-ui,sans-serif;background:#0b0b10;color:#f1f1f6;display:grid;place-items:center;min-height:100vh;margin:0}</style>
+</head>
+<body>
+<p id="msg">A voltar ao Clips…</p>
+<script>
+// TikTok and Google send people here (a fixed https address) after they allow the connection.
+// The `state` they carry says which Clips site started it; send the browser back there with the
+// same parameters. Only that site can check the state's signature and use the code.
+(function () {
+  var params = new URLSearchParams(location.search);
+  var state = params.get("state") || "";
+  var origin = "";
+  try {
+    var part = state.split(".")[0].replace(/-/g, "+").replace(/_/g, "/");
+    origin = JSON.parse(atob(part + "===".slice((part.length + 3) % 4))).o || "";
+  } catch (e) {}
+  if (!/^(https:\/\/[a-z0-9.-]+|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/.test(origin)) {
+    document.getElementById("msg").textContent = "Ligação inválida. Volta ao site do Clips e tenta outra vez.";
+    return;
+  }
+  location.replace(origin + "/api/oauth/callback" + location.search);
+})();
+</script>
+</body>
+</html>
